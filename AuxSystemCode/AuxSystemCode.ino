@@ -1,11 +1,12 @@
 /*#include <LiquidCrystal.h> //for LCD
- * LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
- * int LedVoltage = 8;
- */
+   LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+   int LedVoltage = 8;
+*/
 const int ButtonHazard = 1;  //Inputs
 const int BrakePedal = 2;
 const int ButtonRight = 3;
 const int ButtonLeft = 4;
+const int ButtonHorn = 10;
 unsigned long CurrentMillis = 0;
 unsigned long IntervalStart = 0;  // unsigned Long to increase amount of memory
 const int Interval = 750;         // interval at which to blink (milliseconds)
@@ -14,13 +15,15 @@ const int Interval = 750;         // interval at which to blink (milliseconds)
 const int LedBrake = 5;               // Pin connected to LEDs
 const int LedRight = 6;
 const int LedLeft = 7;
+const int Horn = 9;
 
+int HornState = 0;
 int BrakeState = 0;                // Variables to decrease digitalRead() calls
 int HazardState = 0;               //prev_variables for edge detection
 int RightState = 0;
 int LeftState = 0;
 
-int blueButton = 13;  //Turn Signal LEDs
+int blueButton = 13;  //Turn Button LEDs
 int yellowButton = 12;
 int greenButton = 11;
 
@@ -39,11 +42,11 @@ void setup() {
   pinMode(yellowButton, OUTPUT);
   pinMode(greenButton, OUTPUT);
   /*
-   * lcd.begin(16, 2);
-   * // initialize serial communication at 9600 bits per second:
-   * Serial.begin(9600);
-   *  pinMode(8, OUTPUT);
-   */
+     lcd.begin(16, 2);
+     // initialize serial communication at 9600 bits per second:
+     Serial.begin(9600);
+      pinMode(8, OUTPUT);
+  */
 }
 
 void loop() {
@@ -55,6 +58,14 @@ void loop() {
   else {
     digitalWrite(LedBrake, LOW);
   }
+  HornState = digitalRead(ButtonHorn);
+  if (HornState == HIGH) {
+    digitalWrite(Horn, HIGH);
+  }
+  else {
+    digitalWrite(Horn, LOW);
+  }
+  //light start
   HazardState = digitalRead(ButtonHazard);
   if (HazardState == HIGH) {
     if (CurrentMillis - IntervalStart >= Interval) {
@@ -82,26 +93,30 @@ void loop() {
       }
       return;
     }
-    LeftState = digitalRead(ButtonLeft);
-    if (LeftState == HIGH) {
-      rightOff();
-      if (CurrentMillis - IntervalStart >= Interval) {
-        IntervalStart = CurrentMillis;
-        if (digitalRead(LedLeft) == HIGH) {
-          leftOff();
-        }
-        else {
-          leftOn();
+    else {
+      LeftState = digitalRead(ButtonLeft);
+      if (LeftState == HIGH) {
+        rightOff();
+        if (CurrentMillis - IntervalStart >= Interval) {
+          IntervalStart = CurrentMillis;
+          if (digitalRead(LedLeft) == HIGH) {
+            leftOff();
+          }
+          else {
+            leftOn();
+          }
         }
       }
-      return;
+      else {
+        allOff();
+      }
     }
-    allOff();
-  }
+  }//end light code
+
 }
 
 /* Arudino LCD exsisting code
- * void loop() {
+   void loop() {
   // read the input on analog pin 0:
   int sensorValue = analogRead(A0);
   int sensorValue2 = analogRead(A1);
@@ -130,8 +145,8 @@ void loop() {
   lcd.print(current2);
   lcd.print("mA");
   delay(1500);
-}
- */
+  }
+*/
 void allOn() {
   digitalWrite(LedRight, HIGH);
   digitalWrite(LedLeft, HIGH);
