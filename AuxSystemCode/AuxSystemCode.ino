@@ -1,7 +1,17 @@
-/*#include <LiquidCrystal.h> //for LCD
-   LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
-   int LedVoltage = 8;
-*/
+#include <LiquidCrystal.h>; //for LCD
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+int LedVoltage = 8; //low voltage LED
+
+const int Divider1 = A0;
+const int Divider2 = A1;
+int ADCValue;
+int ADCValue2;
+float voltage;
+float voltage2;
+float current;
+const int LCDInterval = 1500;
+unsigned long LCDIntervalStart = 0;
+
 const int ButtonHazard = 1;  //Inputs
 const int BrakePedal = 2;
 const int ButtonRight = 3;
@@ -41,12 +51,14 @@ void setup() {
   pinMode(blueButton, OUTPUT);
   pinMode(yellowButton, OUTPUT);
   pinMode(greenButton, OUTPUT);
-  /*
-     lcd.begin(16, 2);
-     // initialize serial communication at 9600 bits per second:
-     Serial.begin(9600);
-      pinMode(8, OUTPUT);
-  */
+
+  pinMode(Divider1, INPUT);
+  pinMode(Divider2, INPUT);
+
+  lcd.begin(16, 2);
+  // initialize serial communication at 9600 bits per second:
+  Serial.begin(9600);
+  pinMode(LedVoltage, OUTPUT);
 }
 
 void loop() {
@@ -91,7 +103,6 @@ void loop() {
           rightOn();
         }
       }
-      return;
     }
     else {
       LeftState = digitalRead(ButtonLeft);
@@ -111,8 +122,35 @@ void loop() {
         allOff();
       }
     }
-  }//end light code
-
+  }
+  if (CurrentMillis - LCDIntervalStart >= LCDInterval) {
+    ADCValue = analogRead(Divider1);
+    ADCValue2 = analogRead(Divider2);
+    // Convert the analog reading (which goes from 0 - 1023) to a voltage (0 - 12v)
+    voltage = ADCValue * (12.0 / 1023.0);
+    // Convert the voltage to current
+    voltage2 = ADCValue2 * (12.0 / 1023.0);
+    current = (voltage2 / 220) * 1000;
+    // print out the value you read:
+    // Print a message to the LCD.
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Voltage: ");
+    lcd.print(voltage);
+    lcd.print("V");
+    if (voltage <= 11.90) {
+      digitalWrite(LedVoltage, HIGH);
+    }
+    else {
+      digitalWrite(LedVoltage, LOW);
+    }
+    // set the cursor to column 0, line 1
+    // (note: line 1 is the second row, since counting begins with 0):
+    lcd.setCursor(0, 1);
+    lcd.print("Current: ");
+    lcd.print(current);
+    lcd.print("mA");
+  }
 }
 
 /* Arudino LCD exsisting code
