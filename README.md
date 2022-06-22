@@ -1,5 +1,5 @@
-# solar_car_2021
+# Plano Green Team Auxiliary Electrical System
 
-All Code, schematics and other artifacts for the 2021 car Aux and Main electrical systems go here.
+All Code, schematics and other artifacts for the solar car Aux (and Main) electrical systems go here.
 
 Please add schematics
