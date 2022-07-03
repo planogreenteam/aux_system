@@ -1,5 +1,5 @@
 #include <LiquidCrystal.h>; //for LCD
-LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+//LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 int LedVoltage = 8; //low voltage LED
 
 const int Divider1 = A0;
@@ -12,7 +12,7 @@ float current;
 const int LCDInterval = 1500;
 unsigned long LCDIntervalStart = 0;
 
-const int ButtonHazard = 1;  //Inputs
+const int ButtonHazard = 5;  //Inputs
 const int BrakePedal = 2;
 const int ButtonRight = 3;
 const int ButtonLeft = 4;
@@ -22,9 +22,9 @@ unsigned long IntervalStart = 0;  // unsigned Long to increase amount of memory
 const int Interval = 750;         // interval at which to blink (milliseconds)
 
 
-const int LedBrake = 5;               // Pin connected to LEDs
-const int LedRight = 6;
-const int LedLeft = 7;
+const int LedBrake = 6;               // Pin connected to LEDs
+const int LedRight = 7;
+const int LedLeft = 8;
 const int Horn = 9;
 
 int HornState = 0;
@@ -43,7 +43,7 @@ void setup() {
   pinMode(LedRight, OUTPUT);
   pinMode(LedLeft, OUTPUT);
 
-  pinMode(ButtonHazard, INPUT);       // Set break as input
+  pinMode(ButtonHazard, INPUT_PULLUP);       // Set break as input
   pinMode(BrakePedal, INPUT);     // Set hazard button as input
   pinMode(ButtonRight, INPUT);  // Set right signal as input
   pinMode(ButtonLeft, INPUT);   // Set left signal as input
@@ -55,13 +55,19 @@ void setup() {
   pinMode(Divider1, INPUT);
   pinMode(Divider2, INPUT);
 
-  lcd.begin(16, 2);
+  //lcd.begin(16, 2);
   // initialize serial communication at 9600 bits per second:
   Serial.begin(9600);
   pinMode(LedVoltage, OUTPUT);
 }
 
 void loop() {
+  if(digitalRead(ButtonHazard) == HIGH){
+      Serial.write("Hazard On");
+  } else {
+      Serial.write("Hazard Off");
+  }
+/*
   CurrentMillis = millis();
   BrakeState = digitalRead(BrakePedal);
   if (BrakeState == HIGH) {
@@ -77,9 +83,12 @@ void loop() {
   else {
     digitalWrite(Horn, LOW);
   }
+  */
   //light start
-  HazardState = digitalRead(ButtonHazard);
+ /* HazardState = digitalRead(ButtonHazard);
+  Serial.write("here");
   if (HazardState == HIGH) {
+    
     if (CurrentMillis - IntervalStart >= Interval) {
       IntervalStart = CurrentMillis;
       if (digitalRead(LedRight) == HIGH || digitalRead(LedLeft) == HIGH) {
@@ -89,8 +98,8 @@ void loop() {
         allOn();
       }
     }
-  }
-  else {
+  
+  else 
     RightState = digitalRead(ButtonRight);
     if (RightState == HIGH) {
       leftOff();
@@ -107,6 +116,7 @@ void loop() {
     else {
       LeftState = digitalRead(ButtonLeft);
       if (LeftState == HIGH) {
+        Serial.write("buttonLeft High");
         rightOff();
         if (CurrentMillis - IntervalStart >= Interval) {
           IntervalStart = CurrentMillis;
@@ -114,6 +124,7 @@ void loop() {
             leftOff();
           }
           else {
+            Serial.write("buttonLeft Low");
             leftOn();
           }
         }
@@ -122,7 +133,15 @@ void loop() {
         allOff();
       }
     }
+  } */
+
+/*
+HazardState = digitalRead(ButtonHazard);
+if (HazardState == HIGH){
+     Serial.write("here");
+
   }
+
   if (CurrentMillis - LCDIntervalStart >= LCDInterval) {
     ADCValue = analogRead(Divider1);
     ADCValue2 = analogRead(Divider2);
@@ -133,11 +152,11 @@ void loop() {
     current = (voltage2 / 220) * 1000;
     // print out the value you read:
     // Print a message to the LCD.
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("Voltage: ");
-    lcd.print(voltage);
-    lcd.print("V");
+    //lcd.clear();
+    //lcd.setCursor(0, 0);
+    //lcd.print("Voltage: ");
+    //lcd.print(voltage);
+    //lcd.print("V");
     if (voltage <= 11.90) {
       digitalWrite(LedVoltage, HIGH);
     }
@@ -146,10 +165,10 @@ void loop() {
     }
     // set the cursor to column 0, line 1
     // (note: line 1 is the second row, since counting begins with 0):
-    lcd.setCursor(0, 1);
-    lcd.print("Current: ");
-    lcd.print(current);
-    lcd.print("mA");
+    //lcd.setCursor(0, 1);
+    //lcd.print("Current: ");
+    //lcd.print(current);
+    //lcd.print("mA");
   }
 }
 
@@ -184,7 +203,8 @@ void loop() {
   lcd.print("mA");
   delay(1500);
   }
-*/
+  */
+}
 void allOn() {
   digitalWrite(LedRight, HIGH);
   digitalWrite(LedLeft, HIGH);
@@ -212,3 +232,5 @@ void leftOn() {
 void leftOff() {
   digitalWrite(LedLeft, LOW);
 }
+
+//Button Right to digital pin 3
